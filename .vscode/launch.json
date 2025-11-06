@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug STM32H743 (ST-Link + OpenOCD)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/Debug/H743Test.elf",
+      "device": "STM32H743VI",
+      "runToEntryPoint": "true",
+      "preLaunchTask": "Build",
+      "svdFile": "${workspaceFolder}/STM32H743.svd",
+      "configFiles": [
+        "interface/stlink.cfg",
+        "target/stm32h7x.cfg"
+      ],
+      "serverpath": "openocd",
+      "searchDir": ["/usr/share/openocd/scripts"],
+      "postRestartCommands": ["monitor reset halt"],
+      "postLaunchCommands": ["monitor reset halt"]
+    }
+  ]
+}
