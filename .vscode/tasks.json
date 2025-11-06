@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+
+  "inputs": [
+    {
+      "id": "buildType",
+      "type": "pickString",
+      "description": "Select build type",
+      "options": ["Debug", "Release"],
+      "default": "Debug"
+    },
+    {
+      "id": "flashAddr",
+      "type": "promptString",
+      "description": "Flash start address",
+      "default": "0x08000000"
+    }
+  ],
+
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": {
+      "STM32CUBE_PATH": "/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin",
+      "PATH": "${workspaceFolder}/toolchain/bin:${env:STM32CUBE_PATH}:${env:PATH}"
+    },
+    "windows": {
+      "env": {
+        "Path": "${workspaceFolder}\\toolchain\\bin;${env:Path}"
+      }
+    }
+  },
+
+  "tasks": [
+    {
+      "label": "Configure (${input:buildType})",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S", ".",
+        "-B", "build/${input:buildType}",
+        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/gcc-arm-none-eabi.cmake",
+        "-DCMAKE_BUILD_TYPE=${input:buildType}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Build (${input:buildType})",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build", "build/${input:buildType}",
+        "--config", "${input:buildType}",
+        "-j"
+      ],
+      "dependsOn": ["Configure (${input:buildType})"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": "$gcc"
+    },
+
+    {
+    "label": "Flash (stlink-tools) (${input:buildType})",
+    "type": "shell",
+    "dependsOn": ["Build (${input:buildType})"],
+    "command": "bash -lc 'set -euo pipefail; DIR=\"build/${input:buildType}\"; ELF=$(ls -t \"$DIR\"/*.elf 2>/dev/null | head -n1); if [ -z \"${ELF:-}\" ]; then echo \"❌ No .elf found in $DIR\"; exit 1; fi; echo \"▶ Using ELF: $ELF\"; BIN=\"${ELF%.elf}.bin\"; arm-none-eabi-objcopy -O binary \"$ELF\" \"$BIN\"; arm-none-eabi-size \"$ELF\"; echo \"⚡ Flashing BIN with st-flash @ ${input:flashAddr}\"; st-flash --reset write \"$BIN\" ${input:flashAddr}'",
+    "args": [],
+    "problemMatcher": []
+    },
+    {
+    "label": "Flash (STM32CubeProgrammer, ELF) (${input:buildType})",
+    "type": "shell",
+    "dependsOn": ["Build (${input:buildType})"],
+    "command": "bash -lc 'set -euo pipefail; DIR=\"build/${input:buildType}\"; ELF=$(ls -t \"$DIR\"/*.elf 2>/dev/null | head -n1); if [ -z \"${ELF:-}\" ]; then echo \"❌ No .elf found in $DIR\"; exit 1; fi; echo \"▶ Using ELF: $ELF\"; ${STM32CUBE_PATH}/STM32_Programmer_CLI -c port=SWD -w \"$ELF\" -v -rst'",
+    "args": [],
+    "problemMatcher": []
+    }
+  ]
+}

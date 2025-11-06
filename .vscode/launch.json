@@ -2,24 +2,30 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug STM32H743 (ST-Link + OpenOCD)",
+      "name": "Debug ST-Link + OpenOCD",
       "type": "cortex-debug",
       "request": "launch",
       "servertype": "openocd",
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceFolder}/build/Debug/H743Test.elf",
-      "device": "STM32H743VI",
-      "runToEntryPoint": "true",
-      "preLaunchTask": "Build",
-      "svdFile": "${workspaceFolder}/STM32H743.svd",
+
+      "cwd": "${command:cmake.buildDirectory}",
+      "executable": "${command:cmake.launchTargetPath}",
+
+      "device": "${config:stm32.device}",
+      "svdFile": "${config:stm32.svd}",
+
+      "liveWatch": { "enabled": true, "samplesPerSecond": 4, "refreshRateMs": 250 },
+      "runToEntryPoint": "main",
+      "preLaunchTask": "CMake: build",
+
       "configFiles": [
-        "interface/stlink.cfg",
-        "target/stm32h7x.cfg"
+        "${config:openocd.interfaceCfg}",
+        "${config:openocd.targetCfg}"
       ],
       "serverpath": "openocd",
-      "searchDir": ["/usr/share/openocd/scripts"],
-      "postRestartCommands": ["monitor reset halt"],
-      "postLaunchCommands": ["monitor reset halt"]
+      "searchDir": ["${config:openocd.searchDir}"],
+
+      "postLaunchCommands": ["monitor reset halt"],
+      "postRestartCommands": ["monitor reset halt"]
     }
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",
+  "cmake.configureArgs": [
+    "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/gcc-arm-none-eabi.cmake"
+  ],
+  "cmake.generator": "Unix Makefiles",
+  "cmake.environment": {
+    "PATH": "${workspaceFolder}/toolchain/bin:${env:PATH}"
+  },
+  "cortex-debug.armToolchainPath": "${workspaceFolder}/toolchain/bin",
+
+  "stm32.device": "STM32F411xE",
+  "stm32.svd": "${workspaceFolder}/STM32F411.svd",
+  "openocd.searchDir": "/usr/share/openocd/scripts",
+  "openocd.interfaceCfg": "interface/stlink.cfg",
+  "openocd.targetCfg": "target/stm32f4x.cfg"
+}
