@@ -84,3 +84,7 @@ Copy the `.vscode` folder to your new project and modify according your MCU.
 Go to `Run and Debug` or press `Ctrl+Shift+D` and run `Debug ST-Link + OpenOCD`.
 
 ![Debug](res/debug.gif)
+
+If you want to add an external library (like SSD1306 display driver) add the include path and sources to the `CMakeLists.txt` file, this file does not regenerate with the `STM32CubeMX` tool.
+
+![Debug with display](res/debug_display.gif)
